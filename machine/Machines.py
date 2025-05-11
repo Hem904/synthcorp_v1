@@ -46,6 +46,7 @@ class Machine1:
         print(f"[{self.name}] Production canceled.")
         self.set_state(IdleState(self))
         self.production_started = False  
+        
     def pause_production(self):
         if not self.production_started:
             print("[ERROR] Cannot pause production because production has not started.")
