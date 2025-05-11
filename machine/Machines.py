@@ -8,7 +8,7 @@ class Machine1:
     def __init__(self, name):
         self.name = name
         self.current_state = IdleState(self)
-        self.production_started = False  # Track whether production has started
+        self.production_started = False  
     
     def set_state(self, state):
         self.current_state = state
@@ -23,7 +23,6 @@ class Machine1:
     def perform_action(self):
         if not self.production_started:
             print("[ERROR] Production has not started. You cannot perform any actions.")
-            return  # Prevent any actions if production hasn't started
         if self.current_state:
             log_production(self.name, f"Performing action in state {self.current_state.__class__.__name__}")
             self.current_state.handle(self)
@@ -43,29 +42,28 @@ class Machine1:
     def cancel_production(self):
         if not self.production_started:
             print("[ERROR] Cannot cancel production because production has not started.")
-            return  # Prevent canceling if production hasn't started
+            return  
         print(f"[{self.name}] Production canceled.")
         self.set_state(IdleState(self))
-        self.production_started = False  # Reset production flag
-
+        self.production_started = False  
     def pause_production(self):
         if not self.production_started:
             print("[ERROR] Cannot pause production because production has not started.")
-            return  # Prevent pausing if production hasn't started
+            return  
         print(f"[{self.name}] Production paused.")
         self.set_state(IdleState(self))
 
     def resume_production(self):
         if not self.production_started:
             print("[ERROR] Cannot resume production because production has not started.")
-            return  # Prevent resuming if production hasn't started
+            return  
         print(f"[{self.name}] Production resumed.")
         self.set_state(ActiveState(self))
 
     def start_production(self):
         if self.production_started:
             print("[ERROR] Production has already started.")
-            return  # Prevent starting production if it’s already started
+            return  
         print(f"[{self.name}] Production started.")
         self.set_state(ActiveState(self))
-        self.production_started = True  # Mark production as started
+        self.production_started = True  

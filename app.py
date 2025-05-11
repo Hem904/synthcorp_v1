@@ -3,12 +3,13 @@ from database.db_operations import log_production, update_machine_state, get_mac
 from Behavioral_Patterns.Strategy_pattern.production_strategy import ProductionContext, HighDemandStrategy, LowDemandStrategy, ResourceEfficientStrategy
 from Aditional_features.safety.safety_monitor import SafetyMonitor
 from machine.Machines import Machine1
+from Behavioral_Patterns.Observer_pattern.Machine import Machine
+from Behavioral_Patterns.Observer_pattern.observer import LoggerObserver
 import psycopg2
 from database.db_operations import DB_PARAMS
 
 app = Flask(__name__)
 
-# Register a machine
 @app.route("/register_machine", methods=["POST"])
 def register_machine():
     data = request.get_json()
@@ -25,7 +26,6 @@ def register_machine():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# Production Control (Start, Pause, Cancel)
 @app.route("/production", methods=["POST"])
 def production_control():
     data = request.json
@@ -55,7 +55,6 @@ def production_control():
     else:
         return jsonify({"status": "error", "message": "Invalid action."}), 400
 
-# Safety System: Check hazard condition
 @app.route("/check_safety", methods=["POST"])
 def check_safety():
     data = request.json
@@ -71,9 +70,7 @@ def check_safety():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# Other endpoints (machine state, logs, etc.) remain unchanged...
 
-# View Machine State
 @app.route("/machine_state/<machine_name>", methods=["GET"])
 def machine_state(machine_name):
     try:
@@ -84,7 +81,6 @@ def machine_state(machine_name):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Update Machine State
 @app.route("/update_state", methods=["POST"])
 def update_state():
     data = request.get_json()
@@ -101,7 +97,6 @@ def update_state():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Start, Pause, or Cancel Production
 @app.route("/production", methods=["POST"])
 def production():
     data = request.get_json()
@@ -112,15 +107,12 @@ def production():
 
     try:
         if action == "startProduction":
-            # Perform start production logic
             log_production("Production", "Started")
             return jsonify({"message": "Production started."}), 200
         elif action == "pauseProduction":
-            # Perform pause production logic
             log_production("Production", "Paused")
             return jsonify({"message": "Production paused."}), 200
         elif action == "cancelProduction":
-            # Perform cancel production logic
             log_production("Production", "Cancelled")
             return jsonify({"message": "Production cancelled."}), 200
         else:
@@ -128,7 +120,6 @@ def production():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Get All Logs
 @app.route('/logs', methods=['GET'])
 def get_logs():
     try:
@@ -145,18 +136,66 @@ def get_logs():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/simulate_activity", methods=["POST"])
+def simulate_activity():
+    data = request.get_json()
+    event = data.get("event")
+    machine_name = data.get("machine_name", "DynamicMachine")
 
+    if not event:
+        return jsonify({"error": "Event is required (product, malfunction, maintenance)"}), 400
 
-# Get Logs for Specific Machine
-@app.route("/logs/<machine_name>", methods=["GET"])
-def logs_for_machine(machine_name):
     try:
-        logs = get_logs(machine_name)
-        return jsonify([{"machine": row[0], "action": row[1], "timestamp": row[2].isoformat()} for row in logs])
+        machine = Machine(machine_name)
+        observer = LoggerObserver()
+        machine.attach(observer)
+
+        if event == "product":
+            machine.product()
+        elif event == "malfunction":
+            machine.malfunction()
+        elif event == "maintenance":
+            machine.maintenance_required()
+        else:
+            return jsonify({"error": "Invalid event."}), 400
+
+        return jsonify({"message": f"{event} event executed and observers notified for '{machine_name}'."}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+@app.route("/notifications", methods=["GET"])
+def get_notifications():
+    try:
+        conn = psycopg2.connect(**DB_PARAMS)
+        cur = conn.cursor()
+        cur.execute("SELECT machine_name, message, timestamp FROM notifications ORDER BY timestamp DESC")
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        
+        return jsonify([
+            {"machine": row[0], "message": row[1], "timestamp": row[2].isoformat()} for row in rows
+        ])
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Update Inventory
+
+
+
+@app.route("/logs/<machine_name>", methods=["GET"])
+def logs_for_machine(machine_name):
+    try:
+        logs = get_logs(machine_name)  
+        return jsonify([
+            {"machine": log["machine"], "action": log["action"], "timestamp": log["timestamp"]}
+            for log in logs
+        ])
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/update_inventory", methods=["POST"])
 def update_inventory_route():
     data = request.get_json()
@@ -172,7 +211,6 @@ def update_inventory_route():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Get Observer Notifications
 @app.route("/observer_notifications", methods=["GET"])
 def observer_notifications():
     try:

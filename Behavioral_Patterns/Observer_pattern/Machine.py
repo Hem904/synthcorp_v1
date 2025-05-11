@@ -1,9 +1,23 @@
 class Machine:
+    def __init__(self, name):
+        self.name = name
+        self.observers = []
+
+    def attach(self, observer):
+        self.observers.append(observer)
+
+    def detach(self, observer):
+        self.observers.remove(observer)
+
+    def notify(self, event):
+        for observer in self.observers:
+            observer.update(self.name, event)
+
     def product(self):
-        print("Machine is producing.")
+        self.notify("Product created")
 
     def malfunction(self):
-        print("Machine has malfunctioned.")
+        self.notify("Machine malfunctioned")
 
     def maintenance_required(self):
-        print("Machine requires maintenance.")
+        self.notify("Maintenance required")
