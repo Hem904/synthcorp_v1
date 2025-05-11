@@ -13,7 +13,6 @@ class ProductionLine:
             print(f"step: {step}")
         print("Productionline is finished")
 
-#abstract builder class
 class productionlinebuilder(ABC):
     @abstractmethod
     def __init__(self):
