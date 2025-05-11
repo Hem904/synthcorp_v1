@@ -10,7 +10,6 @@ def init_db():
     )
     cur = conn.cursor()
 
-    # Create machines table if it doesn't exist
     cur.execute("""
     CREATE TABLE IF NOT EXISTS machines (
         id SERIAL PRIMARY KEY,
@@ -21,7 +20,6 @@ def init_db():
     );
     """)
 
-    # Create production_logs table if it doesn't exist
     cur.execute("""
     CREATE TABLE IF NOT EXISTS production_logs (
         id SERIAL PRIMARY KEY,
@@ -31,7 +29,6 @@ def init_db():
     );
     """)
 
-    # Create inventory table if it doesn't exist
     cur.execute("""
     CREATE TABLE IF NOT EXISTS inventory (
         id SERIAL PRIMARY KEY,
