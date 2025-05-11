@@ -22,7 +22,6 @@ class InventoryManager:
             self.reorder(item)
 
     def reorder(self, item):
-        # Default restock level
         restock_amount = 50
         self.inventory[item] += restock_amount
         print(f"Reordered {restock_amount} units of {item}. New quantity: {self.inventory[item]}")

@@ -71,24 +71,35 @@ def get_logs(machine_name=None):
     try:
         conn = psycopg2.connect(**DB_PARAMS)
         cur = conn.cursor()
-        
+
         if machine_name:
-            cur.execute("SELECT action, timestamp FROM production_logs WHERE machine_name = %s ORDER BY timestamp DESC;", (machine_name,))
+            cur.execute(
+                "SELECT action, timestamp FROM production_logs WHERE machine_name = %s ORDER BY timestamp DESC;",
+                (machine_name,)
+            )
+            logs = cur.fetchall()
+            result = [
+                {"machine": machine_name, "action": row[0], "timestamp": row[1].isoformat()}
+                for row in logs
+            ]
         else:
-            cur.execute("SELECT machine_name, action, timestamp FROM production_logs ORDER BY timestamp DESC;")
-        
-        logs = cur.fetchall()
+            cur.execute(
+                "SELECT machine_name, action, timestamp FROM production_logs ORDER BY timestamp DESC;"
+            )
+            logs = cur.fetchall()
+            result = [
+                {"machine": row[0], "action": row[1], "timestamp": row[2].isoformat()}
+                for row in logs
+            ]
+
         cur.close()
         conn.close()
+        return result
 
-        # Return logs in a structured way
-        return [
-            {"machine": row[0] if machine_name else machine_name, "action": row[1], "timestamp": row[2]}
-            for row in logs
-        ]
     except Exception as e:
         print(f"Error fetching logs: {e}")
         raise
+
 
 def update_inventory(item, quantity):
     """Updates the inventory in the database"""
@@ -125,3 +136,12 @@ def get_observer_notifications():
     except Exception as e:
         print(f"Error fetching observer notifications: {e}")
         raise
+
+def store_notification(message):
+    conn = psycopg2.connect(**DB_PARAMS)
+    cur = conn.cursor()
+    cur.execute("INSERT INTO notification (message) VALUES (%s)", (message,))
+    conn.commit()
+    cur.close()
+    conn.close()
+
