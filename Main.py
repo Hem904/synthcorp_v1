@@ -42,15 +42,13 @@ def main():
         choice = input("Select an action by number: ")
 
         if choice == "1":
-            # Register a new machine
             machine_name = input("Enter machine name: ")
             machine = Machine1(machine_name)
             registered_machines.append(machine)
-            safety_monitor.machine = machine  # Link safety monitor to the newly registered machine
+            safety_monitor.machine = machine  
             print(f"Machine '{machine_name}' registered successfully.")
 
         elif choice == "2":
-            # Select a machine to start production
             if not registered_machines:
                 print("No machines registered yet. Please register a machine first.")
                 continue
@@ -62,12 +60,11 @@ def main():
                 selected_machine = registered_machines[machine_choice]
                 selected_machine.start_production()
                 print(f"Production started for {selected_machine.name}.")
-                current_machine = selected_machine  # Set the current machine
+                current_machine = selected_machine  
             else:
                 print("Invalid machine choice.")
 
         elif choice == "3":
-            # Pause production for selected machine
             if not registered_machines or current_machine is None:
                 print("No active machine selected. Please start production first.")
                 continue
@@ -75,7 +72,6 @@ def main():
             print(f"Production paused for {current_machine.name}.")
 
         elif choice == "4":
-            # Resume production for selected machine
             if not registered_machines or current_machine is None:
                 print("No active machine selected. Please start production first.")
                 continue
@@ -83,7 +79,6 @@ def main():
             print(f"Production resumed for {current_machine.name}.")
 
         elif choice == "5":
-            # Cancel production for selected machine
             if not registered_machines or current_machine is None:
                 print("No active machine selected. Please start production first.")
                 continue
@@ -92,27 +87,23 @@ def main():
 
 
         elif choice == "6":
-            # View current machine status
             if not registered_machines or current_machine is None:
                 print("No active machine selected. Please start production first.")
                 continue
             print(f"Current machine status for {current_machine.name}: {current_machine.get_state().__class__.__name__}")
 
         elif choice == "7":
-            # Update inventory
             item = input("Enter material name to update (e.g., lens_material): ")
             quantity = int(input("Enter quantity to update: "))
             inventory_manager.update_inventory(item, quantity)
             print(f"Updated inventory for {item}: {quantity} units.")
 
         elif choice == "8":
-            # Check safety
             condition = input("Enter condition for safety check (overheat, leakage): ")
             safety_monitor.check_hazard(condition)
             print(f"Safety check performed for condition: {condition}")
 
         elif choice == "9":
-            # Change production strategy
             if not registered_machines or current_machine is None:
                 print("No active machine selected. Please start production first.")
                 continue
@@ -132,9 +123,8 @@ def main():
                 print("Invalid strategy choice.")
 
         elif choice == "10":
-            # Exit the program
             print("Exiting the system.")
-            break  # Exit the loop and end the program
+            break  
 
         else:
             print("Invalid choice. Please try again.")
