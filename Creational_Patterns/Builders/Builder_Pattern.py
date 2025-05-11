@@ -56,7 +56,6 @@ class PremiumLineBuilder(productionlinebuilder):
     def get_productionline(self):
         return self.production_line
 
-    
 class BudgetLineBuilder(productionlinebuilder):
 
     def __init__(self):
