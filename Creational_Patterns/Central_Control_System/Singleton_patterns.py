@@ -15,16 +15,13 @@ class CentralControlSystem:
         self.logs = []
         self.system_status = "Idle"
 
-   
     def register_machine(self, machine):
         self.machines.append(machine)
         log_message = f"Machine {machine.__class__.__name__} has been successfully added."
         self._log_event(log_message, machine.__class__.__name__)
 
-
     def get_machine_names(self):
         return [machine.__class__.__name__ for machine in self.machines]
-
 
     def start_production(self):
         self.system_status = "Running"
@@ -41,7 +38,6 @@ class CentralControlSystem:
         self.system_status = "Paused"
         self._log_event("Manufacturing process halted.", "System")
 
-   
     def _log_event(self, message, machine_name):
         entry = f"[{machine_name}] {message}"
         self.logs.append(entry)
@@ -60,9 +56,6 @@ class CentralControlSystem:
         for machine in self.machines:
             if hasattr(machine, "add_observer"):
                 machine.add_observer(observer)
-
-
-    # -------------------- Status Summary --------------------
 
     def to_dict(self):
         return {
