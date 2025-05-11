@@ -84,7 +84,6 @@ class SynthCorpApp:
 
         ttk.Button(frame, text="Refresh Logs", command=self.fetch_logs).pack(pady=5)
 
-    # --- Action Methods ---  
     def register_machine(self):
         name = self.machine_name.get()
         threading.Thread(target=self._register_machine, args=(name,)).start()
